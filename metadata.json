@@ -1,6 +1,0 @@
-{
-  "name": "متجر روز للتصوير | ROS Store",
-  "description": "متجر إلكتروني لمعدات التصوير الاحترافية مع لوحة تحكم إدارية شاملة",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
