@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ROS Admin | لوحة التحكم</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#C9A84C;--gl:#E8C97A;--gd:#9A7A30;
+  --pk:#F2C4CE;--pkb:#FDF0F3;--pkd:#C47A8A;
+  --bg:#0F0A0C;--bg2:#1A1015;
+  --card:#1E1318;--card2:#251A1F;
+  --bdr:#3A2530;
+  --tx:#F5EEF0;--tx2:#B09098;
+  --grn:#4CAF50;--red:#E05555;--blu:#5B8DEF;--org:#F0944D;
+  --sh:rgba(201,168,76,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;overflow-x:hidden}
+
+.sb{width:250px;min-width:250px;background:var(--bg2);border-left:1px solid var(--bdr);display:flex;flex-direction:column;position:fixed;top:0;right:0;bottom:0;z-index:100;transition:transform .3s}
+.sb-logo{padding:20px 16px 16px;border-bottom:1px solid var(--bdr)}
+.sb-logo-t{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,var(--gd),var(--gl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sb-sub{font-size:.66rem;color:var(--tx2);margin-top:2px}
+.sb-nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;cursor:pointer;color:var(--tx2);font-size:.87rem;font-weight:500;transition:all .2s;border:none;background:none;text-align:right;width:100%;position:relative}
+.sb-btn:hover{background:var(--card2);color:var(--tx)}
+.sb-btn.on{background:linear-gradient(135deg,rgba(201,168,76,.17),rgba(201,168,76,.06));color:var(--gl);border:1px solid rgba(201,168,76,.22)}
+.sb-ic{font-size:1.1rem;min-width:22px;text-align:center}
+.sb-badge{margin-right:auto;background:var(--red);color:#fff;border-radius:8px;font-size:.63rem;padding:2px 6px;font-weight:700}
+.sb-sec{font-size:.66rem;color:var(--tx2);letter-spacing:.8px;padding:12px 12px 4px;text-transform:uppercase}
+.sb-foot{padding:12px;border-top:1px solid var(--bdr)}
+.store-lnk{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--gold),var(--gd));color:#fff;border-radius:11px;padding:10px 14px;font-size:.84rem;font-weight:700;text-decoration:none;transition:opacity .2s}
+.store-lnk:hover{opacity:.88}
+
+.main{margin-right:250px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:90;background:rgba(15,10,12,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--bdr);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tb-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--gl)}
+.tb-right{display:flex;align-items:center;gap:9px}
+.tb-btn{background:var(--card2);border:1px solid var(--bdr);color:var(--tx2);border-radius:8px;padding:6px 12px;font-size:.78rem;cursor:pointer;font-family:'Tajawal',sans-serif;transition:.2s}
+.tb-btn:hover{border-color:var(--gold);color:var(--gl)}
+.content{flex:1;padding:20px 22px 40px}
+
+.page{display:none}.page.on{display:block}
+
+.srow{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:13px;margin-bottom:22px}
+.sc{background:var(--card);border-radius:14px;padding:17px;border:1px solid var(--bdr);position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+.sc:hover{transform:translateY(-3px);border-color:var(--gold)}
+.sc::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(201,168,76,.07),transparent 70%);pointer-events:none}
+.sc-ic{font-size:1.8rem;margin-bottom:8px}
+.sc-v{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--gl)}
+.sc-l{font-size:.78rem;color:var(--tx2);margin-top:3px}
+
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:9px}
+.sec-hd h3{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--gl)}
+
+.btn-g{background:linear-gradient(135deg,var(--gold),var(--gd));color:#fff;border:none;border-radius:10px;padding:8px 16px;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 3px 11px var(--sh)}
+.btn-g:hover{transform:translateY(-2px)}
+.btn-r{background:linear-gradient(135deg,#e05,#c03);color:#fff;border:none;border-radius:8px;padding:6px 11px;font-family:'Tajawal',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;transition:.2s}
+.btn-r:hover{opacity:.85}
+.btn-o{background:transparent;border:1.5px solid var(--bdr);color:var(--tx2);border-radius:8px;padding:6px 11px;font-family:'Tajawal',sans-serif;font-size:.76rem;cursor:pointer;transition:.2s}
+.btn-o:hover{border-color:var(--gold);color:var(--gl)}
+
+.tbl-wrap{background:var(--card);border-radius:14px;border:1px solid var(--bdr);overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{background:var(--card2);padding:10px 13px;font-size:.76rem;color:var(--tx2);font-weight:700;text-align:right;border-bottom:1px solid var(--bdr);white-space:nowrap}
+td{padding:10px 13px;font-size:.83rem;border-bottom:1px solid var(--bdr);vertical-align:middle}
+
+.mo{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.73);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .28s}
+.mo.on{opacity:1;pointer-events:all}
+.mbox{position:fixed;inset:0;z-index:201;display:flex;align-items:center;justify-content:center;padding:16px;pointer-events:none;opacity:0;transform:scale(.9) translateY(18px);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.mbox.on{opacity:1;pointer-events:all;transform:scale(1) translateY(0)}
+.mi{background:var(--card);border-radius:20px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;border:1px solid var(--bdr)}
+.mh{padding:16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.mc{background:var(--card2);border:none;border-radius:50%;width:29px;height:29px;cursor:pointer;color:var(--tx2)}
+.mb{padding:18px;display:flex;flex-direction:column;gap:13px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:.79rem;color:var(--tx2)}
+.fg input,.fg select,.fg textarea{background:var(--bg2);border:1.5px solid var(--bdr);border-radius:10px;padding:9px 12px;color:var(--tx);font-family:'Tajawal',sans-serif;font-size:.87rem;outline:none}
+.mf{padding:13px 18px;border-top:1px solid var(--bdr);display:flex;gap:7px;justify-content:flex-end}
+
+.media-drop{border:2px dashed var(--bdr);border-radius:12px;padding:18px;text-align:center;cursor:pointer;position:relative}
+.media-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.mp-item{position:relative;width:60px;height:60px;border-radius:8px;overflow:hidden;border:1px solid var(--bdr)}
+.mp-item img, .mp-item video{width:100%;height:100%;object-fit:cover}
+.mp-del{position:absolute;top:2px;left:2px;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;border:none;cursor:pointer}
+
+.lp{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.lb{background:var(--card);border-radius:24px;padding:38px;max-width:370px;width:100%;border:1px solid var(--bdr);text-align:center}
+.linp{background:var(--bg2);border:1.5px solid var(--bdr);border-radius:10px;padding:10px;color:var(--tx);font-family:'Tajawal',sans-serif;width:100%;margin-bottom:10px;text-align:right}
+
+.at{position:fixed;bottom:24px;left:24px;z-index:9999;background:var(--gold);color:#fff;padding:10px 20px;border-radius:12px;box-shadow:0 7px 20px rgba(0,0,0,0.3);transform:translateY(100px);transition:0.3s}
+.at.show{transform:translateY(0)}
+
+/* --- Analytics Charts --- */
+.chart-bar-wrap { display:flex; align-items:center; margin-bottom:12px; gap:12px; }
+.chart-label { width: 120px; font-size: 0.85rem; color: var(--tx2); text-align: left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chart-bar-bg { flex: 1; background: var(--bg2); border-radius: 8px; height: 14px; overflow: hidden; border: 1px solid var(--bdr); }
+.chart-bar-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; }
+.cbf-gold { background: linear-gradient(90deg, var(--gd), var(--gold)); }
+.cbf-blue { background: linear-gradient(90deg, #2b5876, #4e4376); }
+.chart-val { width: 40px; font-size: 0.85rem; font-weight: 900; color: var(--gl); }
+
+@media(max-width:840px){
+  .sb{transform:translateX(250px)}.sb.open{transform:translateX(0)}
+  .main{margin-right:0}
+}
+</style>
+</head>
+<body>
+
+<div class="lp" id="LP">
+  <div class="lb">
+    <h1 style="color:var(--gl);margin-bottom:10px">ROS ADMIN</h1>
+    <input class="linp" type="text" id="LU" placeholder="البريد الإلكتروني"/>
+    <input class="linp" type="password" id="LPW" placeholder="كلمة المرور"/>
+    <button class="btn-g" style="width:100%" onclick="window.login()">دخول</button>
+    <p style="margin-top:15px;font-size:0.7rem;color:var(--tx2)">admin@ros.com | ros2024</p>
+  </div>
+</div>
+
+<aside class="sb" id="SB">
+  <div class="sb-logo"><div class="sb-logo-t">ROS</div></div>
+  <nav class="sb-nav">
+    <button class="sb-btn on" onclick="window.showPg('dashboard', this)">📊 لوحة المعلومات</button>
+    <button class="sb-btn" onclick="window.showPg('analytics', this)">📈 التحليلات</button>
+    <button class="sb-btn" onclick="window.showPg('categories', this)">📂 الأقسام</button>
+    <button class="sb-btn" onclick="window.showPg('products', this)">📦 المنتجات</button>
+    <button class="sb-btn" onclick="window.showPg('discounts', this)">🏷️ الخصومات</button>
+    <button class="sb-btn" onclick="window.showPg('orders', this)">🛒 الطلبات <span class="sb-badge" id="nBadge">0</span></button>
+  </nav>
+  <div class="sb-foot"><a href="index.html" class="store-lnk">🛍️ المتجر</a></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <button onclick="document.getElementById('SB').classList.toggle('open')" style="background:none;border:none;color:var(--gl);font-size:1.5rem">☰</button>
+    <div class="tb-title" id="PT">لوحة المعلومات</div>
+    <button class="tb-btn" onclick="location.reload()">خروج</button>
+  </div>
+
+  <div class="content">
+    <div class="page on" id="pg-dashboard">
+      <div class="srow" id="ds"></div>
+    </div>
+    <div class="page" id="pg-analytics">
+      <div class="sec-hd"><h3>📈 تحليلات المتجر</h3></div>
+      <div class="srow">
+        <div class="sc" style="grid-column: span 1;">
+          <h4 style="color:var(--gl);margin-bottom:20px;font-family:'Playfair Display',serif">الطلبات حسب المحافظة</h4>
+          <div id="govChart"></div>
+        </div>
+        <div class="sc" style="grid-column: span 1;">
+          <h4 style="color:var(--gl);margin-bottom:20px;font-family:'Playfair Display',serif">المنتجات الأكثر طلباً</h4>
+          <div id="prodChart"></div>
+        </div>
+      </div>
+    </div>
+    <div class="page" id="pg-categories">
+      <div class="sec-hd"><h3>📂 الأقسام</h3><button class="btn-g" onclick="window.openCM()">+ إضافة قسم</button></div>
+      <div class="tbl-wrap"><table><thead><tr><th>أيقونة</th><th>الاسم</th><th>المنتجات</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="catTb"></tbody></table></div>
+    </div>
+    <div class="page" id="pg-products">
+      <div class="sec-hd"><h3>📦 المنتجات</h3><button class="btn-g" onclick="window.openPM()">+ إضافة منتج</button></div>
+      <div class="tbl-wrap"><table><thead><tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>القسم</th><th>إجراءات</th></tr></thead><tbody id="prodTb"></tbody></table></div>
+    </div>
+    <div class="page" id="pg-discounts">
+      <div class="sec-hd"><h3>🏷️ الخصومات</h3><button class="btn-g" onclick="window.openDM()">+ إضافة كود</button></div>
+      <div id="discList"></div>
+    </div>
+    <div class="page" id="pg-orders">
+      <div class="sec-hd"><h3>🛒 طلبات الزبائن</h3></div>
+      <div class="tbl-wrap"><table><thead><tr><th>الزبون</th><th>الهاتف</th><th>المجموع</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="ordsTb"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="mo-bg" onclick="closeAll()"></div>
+<div class="mbox" id="mbox">
+  <div class="mi" id="mContent" onclick="event.stopPropagation()"></div>
+</div>
+
+<div class="at" id="AT"></div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const fc = {
+  apiKey: "AIzaSyATBOti7TbRF8e1h9plCSK0szwZiYIhl-s",
+  authDomain: "steel-broker-2sjh2.firebaseapp.com",
+  projectId: "steel-broker-2sjh2",
+  storageBucket: "steel-broker-2sjh2.firebasestorage.app",
+  messagingSenderId: "120538130894",
+  appId: "1:120538130894:web:ba8c6ae45bccda59c4639f",
+  firestoreDatabaseId: "ai-studio-41b7f95b-6c7e-4ba2-945f-05c9b9f81ccd"
+};
+
+const app = initializeApp(fc);
+const db = getFirestore(app, fc.firestoreDatabaseId);
+
+window.login = () => {
+  if(document.getElementById('LU').value==='admin@ros.com' && document.getElementById('LPW').value==='ros2024') {
+    document.getElementById('LP').style.display='none';
+    init();
+  } else toast('❌ خطأ في البيانات');
+};
+
+let data = { cats:[], prods:[], discs:[], ords:[] };
+
+function init() {
+  onSnapshot(collection(db, "categories"), s => { data.cats = s.docs.map(d => ({id:d.id, ...d.data()})); render(); });
+  onSnapshot(collection(db, "products"), s => { data.prods = s.docs.map(d => ({id:d.id, ...d.data()})); render(); });
+  onSnapshot(collection(db, "discounts"), s => { data.discs = s.docs.map(d => ({id:d.id, ...d.data()})); render(); });
+  onSnapshot(query(collection(db, "orders"), orderBy("date", "desc")), s => { data.ords = s.docs.map(d => ({id:d.id, ...d.data()})); render(); });
+}
+
+function render() {
+  const pg = document.querySelector('.page.on').id;
+  if(pg==='pg-dashboard') {
+    const total = data.ords.reduce((s,o)=>s+o.total,0);
+    document.getElementById('ds').innerHTML = `
+      <div class="sc"><div class="sc-ic">💰</div><div class="sc-v">${total.toLocaleString()}</div><div class="sc-l">إجمالي المبيعات</div></div>
+      <div class="sc"><div class="sc-ic">🛒</div><div class="sc-v">${data.ords.length}</div><div class="sc-l">إجمالي الطلبات</div></div>
+      <div class="sc"><div class="sc-ic">📦</div><div class="sc-v">${data.prods.length}</div><div class="sc-l">المنتجات</div></div>
+    `;
+  }
+  if(pg==='pg-categories') {
+    document.getElementById('catTb').innerHTML = data.cats.map(c => `
+      <tr>
+        <td>${c.img ? `<img src="${c.img}" style="width:30px;height:30px;border-radius:5px">` : c.icon}</td>
+        <td>${c.name}</td>
+        <td>${data.prods.filter(p=>p.cat===c.id).length}</td>
+        <td><span class="bdg ${c.status==='active'?'bg-g':'bg-r'}">${c.status}</span></td>
+        <td>
+          <button class="btn-o" style="margin-left:5px" onclick="openCM('${c.id}')">تعديل</button>
+          <button class="btn-r" onclick="del('categories', '${c.id}')">حذف</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  if(pg==='pg-products') {
+    document.getElementById('prodTb').innerHTML = data.prods.map(p => `
+      <tr>
+        <td><img src="${p.media?.[0]?.url || ''}" style="width:30px;height:30px;border-radius:5px"></td>
+        <td>${p.name}</td>
+        <td>${p.price.toLocaleString()}</td>
+        <td>${data.cats.find(c=>c.id===p.cat)?.name || ''}</td>
+        <td>
+          <button class="btn-o" style="margin-left:5px" onclick="openPM('${p.id}')">تعديل</button>
+          <button class="btn-r" onclick="del('products', '${p.id}')">حذف</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  if(pg==='pg-discounts') {
+    document.getElementById('discList').innerHTML = (data.discs||[]).map(d => `
+      <div class="sc" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div class="sc-v">${d.code}</div>
+          <div class="sc-l">خصم: ${d.val}${d.type==='fix'?' IQD':'%'}</div>
+        </div>
+        <button class="btn-r" onclick="del('discounts', '${d.id}')">حذف</button>
+      </div>
+    `).join('');
+    if(!(data.discs||[]).length) document.getElementById('discList').innerHTML = '<p style="text-align:center;color:var(--tx2);padding:20px">لا يوجد أكواد خصم حالية</p>';
+  }
+  if(pg==='pg-orders') {
+    document.getElementById('ordsTb').innerHTML = data.ords.map(o => `
+      <tr>
+        <td>${o.name} <br><span style="font-size:0.7rem;color:var(--tx2)">${o.gov || ''} - ${o.address || ''}</span></td>
+        <td>${o.phone}</td>
+        <td>${o.total.toLocaleString()}</td>
+        <td><select onchange="upSt('${o.id}', this.value)" style="background:none;color:#fff;border:1px solid var(--bdr);border-radius:6px;padding:3px">
+          <option value="new" ${o.status==='new'?'selected':''}>جديد</option>
+          <option value="done" ${o.status==='done'?'selected':''}>مكتمل</option>
+        </select></td>
+        <td>
+          <button class="btn-g" style="padding:5px 8px;font-size:0.75rem;margin-left:5px" onclick="viewOrd('${o.id}')">التفاصيل</button>
+          <button class="btn-r" onclick="del('orders', '${o.id}')">حذف</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  if(pg==='pg-analytics') {
+    let govs = {};
+    let prodCount = {};
+    data.ords.forEach(o => {
+      let g = o.gov || 'غير محدد';
+      govs[g] = (govs[g] || 0) + 1;
+      if(o.items) {
+        o.items.forEach(i => {
+          prodCount[i.name] = (prodCount[i.name] || 0) + i.qty;
+        });
+      }
+    });
+    
+    let maxGov = Math.max(1, ...Object.values(govs));
+    let govHtml = Object.keys(govs).sort((a,b)=>govs[b]-govs[a]).map(g => `
+      <div class="chart-bar-wrap">
+        <div class="chart-label">${g}</div>
+        <div class="chart-bar-bg">
+          <div class="chart-bar-fill cbf-gold" style="width:${(govs[g]/maxGov)*100}%"></div>
+        </div>
+        <div class="chart-val">${govs[g]}</div>
+      </div>
+    `).join('');
+    document.getElementById('govChart').innerHTML = govHtml || '<p style="color:var(--tx2);font-size:0.8rem">لا توجد بيانات للتحليل</p>';
+
+    let maxProd = Math.max(1, ...Object.values(prodCount));
+    let prodHtml = Object.keys(prodCount).sort((a,b)=>prodCount[b]-prodCount[a]).slice(0,10).map(p => `
+      <div class="chart-bar-wrap">
+        <div class="chart-label" title="${p}">${p}</div>
+        <div class="chart-bar-bg">
+          <div class="chart-bar-fill cbf-blue" style="width:${(prodCount[p]/maxProd)*100}%"></div>
+        </div>
+        <div class="chart-val">${prodCount[p]}</div>
+      </div>
+    `).join('');
+    document.getElementById('prodChart').innerHTML = prodHtml || '<p style="color:var(--tx2);font-size:0.8rem">لا توجد بيانات للتحليل</p>';
+  }
+  document.getElementById('nBadge').innerText = data.ords.filter(o=>o.status==='new').length;
+}
+
+window.viewOrd = id => {
+  const o = data.ords.find(x => x.id === id);
+  if(!o) return;
+  document.getElementById('mbox').classList.add('on'); document.getElementById('mo-bg').classList.add('on');
+  document.getElementById('mContent').innerHTML = `
+    <div class="mh"><h3>تفاصيل الطلب</h3><button class="mc" onclick="closeAll()">✕</button></div>
+    <div class="mb" style="line-height:1.8;text-align:right">
+      <p><strong>الزبون:</strong> ${o.name}</p>
+      <p><strong>رقم الهاتف:</strong> ${o.phone}</p>
+      <p><strong>المحافظة:</strong> ${o.gov || '-'}</p>
+      <p><strong>نقطة دالة:</strong> ${o.address || '-'}</p>
+      <p><strong>ملاحظة:</strong> ${o.note || '-'}</p>
+      <p><strong>التاريخ:</strong> ${new Date(o.date).toLocaleString('ar-IQ')}</p>
+      <hr style="border-color:var(--bdr);margin:10px 0">
+      <h4>المنتجات:</h4>
+      <ul style="list-style:none;padding:0;margin-top:10px">
+        ${(o.items||[]).map(i => `<li style="background:var(--bg2);padding:8px;border-radius:8px;margin-bottom:8px;border:1px solid var(--bdr);font-size:0.85rem">- ${i.name} <strong style="color:var(--gl)">(×${i.qty})</strong> = ${(i.price * i.qty).toLocaleString()}</li>`).join('')}
+      </ul>
+      <hr style="border-color:var(--bdr);margin:10px 0">
+      <h4 style="color:var(--gl);font-size:1.1rem">المجموع الكلي: ${o.total.toLocaleString()} IQD</h4>
+    </div>
+  `;
+};
+
+window.showPg = (p, btn) => {
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('on'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+p).classList.add('on');
+  if(btn) btn.classList.add('on');
+  render();
+};
+
+let deleteTarget = null;
+window.del = (col, id) => {
+  deleteTarget = { col, id };
+  document.getElementById('mbox').classList.add('on'); document.getElementById('mo-bg').classList.add('on');
+  document.getElementById('mContent').innerHTML = `
+    <div class="mh"><h3>تأكيد الحذف</h3><button onclick="closeAll()">✕</button></div>
+    <div class="mb" style="text-align:center;padding:30px">
+      <div style="font-size:3rem;margin-bottom:15px">⚠️</div>
+      <p>هل أنت متأكد من رغبتك في حذف هذا العنصر؟</p>
+      <p style="color:var(--tx2);font-size:0.8rem;margin-top:5px">لا يمكن التراجع عن هذه الخطوة.</p>
+    </div>
+    <div class="mf">
+      <button class="btn-o" onclick="closeAll()">إلغاء</button>
+      <button class="btn-r" style="padding:10px 20px" onclick="confirmDel()">تأكيد الحذف</button>
+    </div>
+  `;
+};
+
+window.confirmDel = async () => {
+  if(!deleteTarget) return;
+  try {
+    await deleteDoc(doc(db, deleteTarget.col, deleteTarget.id));
+    toast('✅ تم الحذف بنجاح');
+  } catch (e) {
+    toast('❌ فشل الحذف');
+  }
+  deleteTarget = null;
+  closeAll();
+};
+
+window.upSt = async (id, s) => { await updateDoc(doc(db, "orders", id), {status:s}); toast('✅ تم التحديث'); };
+
+// RESIZE IMAGE FUNCTION TO FIX 1MB LIMIT
+function resizeImg(file, max=500) {
+  return new Promise(res => {
+    const r = new FileReader(); r.onload = e => {
+      const img = new Image(); img.onload = () => {
+        const c = document.createElement('canvas');
+        const s = Math.min(1, max/Math.max(img.width, img.height));
+        c.width = img.width*s; c.height = img.height*s;
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg', 0.7));
+      }; img.src = e.target.result;
+    }; r.readAsDataURL(file);
+  });
+}
+
+window.openCM = (id) => {
+  const c = id ? data.cats.find(x=>x.id===id) : null;
+  document.getElementById('mbox').classList.add('on'); document.getElementById('mo-bg').classList.add('on');
+  document.getElementById('mContent').innerHTML = `
+    <div class="mh"><h3>${c ? 'تعديل قسم' : 'إضافة قسم'}</h3><button onclick="closeAll()">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label>اسم القسم</label><input id="cn" type="text" value="${c ? c.name : ''}"></div>
+      <div class="fg"><label>أيقونة</label><input id="ci" type="text" value="${c ? c.icon : '📁'}"></div>
+      <div class="fg"><label>صورة (اختياري)</label><input type="file" onchange="window.catImg=this.files[0]"></div>
+    </div>
+    <div class="mf"><button class="btn-g" onclick="saveCat('${id||''}')">حفظ</button></div>
+  `;
+};
+
+window.saveCat = async (id) => {
+  const n = document.getElementById('cn').value; if(!n) return;
+  let img = null;
+  if(window.catImg) img = await resizeImg(window.catImg);
+  else if(id) img = data.cats.find(x=>x.id===id).img;
+
+  const cid = id || 'cat_'+Date.now();
+  await setDoc(doc(db, "categories", cid), { name:n, icon:document.getElementById('ci').value, status:'active', desc:'', img: img||null });
+  closeAll(); toast('✅ تم الحفظ');
+};
+
+window.openPM = (id) => {
+  const p = id ? data.prods.find(x=>x.id===id) : null;
+  document.getElementById('mbox').classList.add('on'); document.getElementById('mo-bg').classList.add('on');
+  document.getElementById('mContent').innerHTML = `
+    <div class="mh"><h3>${p ? 'تعديل منتج' : 'إضافة منتج'}</h3><button onclick="closeAll()">✕</button></div>
+    <div class="mb" style="max-height:80vh;overflow-y:auto">
+      <div class="fg"><label>اسم المنتج</label><input id="pn" type="text" value="${p ? p.name : ''}"></div>
+      <div class="fg"><label>السعر</label><input id="pp" type="number" value="${p ? p.price : ''}"></div>
+      <div class="fg"><label>القسم</label><select id="pc">${data.cats.map(c=>`<option value="${c.id}" ${p && p.cat===c.id ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>وصف المنتج</label><textarea id="pdesc" rows="4">${p ? p.desc : ''}</textarea></div>
+      <div class="fg"><label>ميديا (صور وفيديوهات)</label><input type="file" multiple accept="image/*,video/*" onchange="window.pFiles=Array.from(this.files)"></div>
+    </div>
+    <div class="mf"><button class="btn-g" onclick="window.saveProd('${id||''}')">حفظ</button></div>
+  `;
+};
+
+window.saveProd = async (id) => {
+  const n = document.getElementById('pn').value, pr = document.getElementById('pp').value, desc = document.getElementById('pdesc').value; if(!n||!pr) return;
+  let media = id ? (data.prods.find(x=>x.id===id).media || []) : [];
+  
+  if(window.pFiles && window.pFiles.length > 0) {
+    const newMedia = [];
+    for(let f of window.pFiles) {
+      if(f.type.startsWith('image/')) {
+        const url = await resizeImg(f, 700);
+        newMedia.push({url, type:'image', name:f.name});
+      } else if(f.type.startsWith('video/')) {
+        const url = await toBase64(f);
+        newMedia.push({url, type:'video', name:f.name});
+      }
+    }
+    media = [...media, ...newMedia];
+  }
+
+  const pid = id || 'p_'+Date.now();
+  await setDoc(doc(db, "products", pid), { name:n, price:Number(pr), cat:document.getElementById('pc').value, media, status:'active', orders:0, disc:0, desc:desc, icon:'📦' });
+  closeAll(); window.pFiles = []; toast('✅ تم الحفظ');
+};
+
+const toBase64 = file => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = error => reject(error);
+});
+
+window.openDM = () => {
+  document.getElementById('mbox').classList.add('on'); document.getElementById('mo-bg').classList.add('on');
+  document.getElementById('mContent').innerHTML = `
+    <div class="mh"><h3>إضافة كود خصم</h3><button onclick="closeAll()">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label>الكود</label><input id="dc" type="text" placeholder="مثال: ROS10"></div>
+      <div class="fg"><label>نوع الخصم</label><select id="dt"><option value="per">نسبة مئوية %</option><option value="fix">مبلغ ثابت IQD</option></select></div>
+      <div class="fg"><label>القيمة</label><input id="dv" type="number"></div>
+    </div>
+    <div class="mf"><button class="btn-g" onclick="saveDisc()">حفظ</button></div>
+  `;
+};
+
+window.saveDisc = async () => {
+  const c = document.getElementById('dc').value, t = document.getElementById('dt').value, v = document.getElementById('dv').value;
+  if(!c || !v) return;
+  const id = 'd_'+Date.now();
+  await setDoc(doc(db, "discounts", id), { code:c.toUpperCase(), type:t, val:Number(v), status:'active' });
+  closeAll(); toast('✅ تم الحفظ');
+};
+
+window.closeAll = () => { document.getElementById('mbox').classList.remove('on'); document.getElementById('mo-bg').classList.remove('on'); };
+function toast(m) { const t=document.getElementById('AT'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+</script>
+</body>
+</html>
