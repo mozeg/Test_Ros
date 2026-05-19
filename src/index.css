@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Tajawal", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", serif;
+}
+
+:root {
+  /* Common variables */
+  --gold: #C9A84C;
+  --gl: #E8C97A;
+  --gd: #9A7A30;
+  --pk: #F2C4CE;
+  --pkb: #FDF0F3;
+  --pkd: #C47A8A;
+  
+  /* Admin specific (namespaced or common) */
+  --admin-bg: #0F0A0C;
+  --admin-bg2: #1A1015;
+  --admin-card: #1E1318;
+  --admin-card2: #251A1F;
+  --admin-bdr: #3A2530;
+  --admin-tx: #F5EEF0;
+  --admin-tx2: #B09098;
+  
+  /* Store specific */
+  --store-white: #FFFAF9;
+  --store-text-dark: #2C1A1E;
+  --store-text-mid: #5C3A42;
+  --store-pink-bg: #FDF0F3;
+  
+  --grn: #4CAF50;
+  --red: #E05555;
+  --blu: #5B8DEF;
+  --org: #F0944D;
+  --sh: rgba(201, 168, 76, 0.15);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ADMIN STYLES
+───────────────────────────────────────────────────────────────────────────── */
+
+body.admin-mode {
+  background: var(--admin-bg);
+  color: var(--admin-tx);
+  font-family: 'Tajawal', sans-serif;
+}
+
+.admin-mode .sb {
+  width: 250px;
+  min-width: 250px;
+  background: var(--admin-bg2);
+  border-left: 1px solid var(--admin-bdr);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  transition: transform .3s;
+}
+
+.admin-mode .main {
+  margin-right: 250px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-mode .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background: rgba(15, 10, 12, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--admin-bdr);
+  padding: 12px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-mode .sc {
+  background: var(--admin-card);
+  border-radius: 14px;
+  padding: 17px;
+  border: 1px solid var(--admin-bdr);
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s, border-color .25s;
+}
+
+.admin-mode .sc:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold);
+}
+
+.admin-mode .tbl-wrap {
+  background: var(--admin-card);
+  border-radius: 14px;
+  border: 1px solid var(--admin-bdr);
+  overflow: auto;
+}
+
+.admin-mode table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-mode th {
+  background: var(--admin-card2);
+  padding: 10px 13px;
+  font-size: .76rem;
+  color: var(--admin-tx2);
+  text-align: right;
+  border-bottom: 1px solid var(--admin-bdr);
+}
+
+.admin-mode td {
+  padding: 10px 13px;
+  font-size: .83rem;
+  border-bottom: 1px solid var(--admin-bdr);
+  vertical-align: middle;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STORE STYLES
+───────────────────────────────────────────────────────────────────────────── */
+
+body.store-mode {
+  background: var(--store-white);
+  color: var(--store-text-dark);
+  font-family: 'Tajawal', sans-serif;
+}
+
+.store-mode header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(253, 240, 243, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid var(--pk);
+  box-shadow: 0 2px 24px var(--sh);
+}
+
+.store-mode .hero {
+  background: linear-gradient(135deg, #fce4ec 0%, #fff8f0 50%, #fce4ec 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 80px 28px 70px;
+  text-align: center;
+}
+
+.store-mode .cat-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px 16px;
+  text-align: center;
+  border: 1.5px solid var(--pk);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.store-mode .cat-card:hover, .store-mode .cat-card.active {
+  border-color: var(--gold);
+  box-shadow: 0 8px 28px var(--sh);
+  transform: translateY(-4px);
+}
+
+.store-mode .prod-card {
+  background: #fff;
+  border-radius: 22px;
+  border: 1.5px solid var(--pk);
+  overflow: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* Common Classes used across both */
+.btn-g {
+  background: linear-gradient(135deg, var(--gold), var(--gd));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+  box-shadow: 0 3px 11px var(--sh);
+}
+
+.btn-r {
+  background: linear-gradient(135deg, #e05, #c03);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bdg {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: .7rem;
+  font-weight: 700;
+}
+
+.bg-g { background: rgba(76, 175, 80, 0.15); color: #4CAF50; }
+.bg-r { background: rgba(224, 85, 85, 0.15); color: #E05555; }
+.bg-o { background: rgba(240, 148, 77, 0.15); color: #F0944D; }
+.bg-b { background: rgba(91, 141, 239, 0.15); color: #5B8DEF; }
+.bg-gd { background: rgba(201, 168, 76, 0.15); color: var(--gl); }
+
+/* Utility */
+.rtl { direction: rtl; }
